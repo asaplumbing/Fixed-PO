@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PO Generator</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: auto; }
+    label, input, select, textarea, button { display: block; width: 100%; margin-bottom: 12px; }
+    button { padding: 10px; background: black; color: white; border: none; cursor: pointer; }
+    .po-result { font-size: 1.2em; font-weight: bold; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h2>Create PO</h2>
+  <form id="po-form">
+    <label for="tech">Technician</label>
+    <select id="tech" required>
+      <option value="">-- Select --</option>
+      <option value="Tzvi">Tzvi</option>
+      <option value="Chris">Chris</option>
+      <option value="Ryan">Ryan</option>
+      <option value="Yitz">Yitz</option>
+    </select>
+
+    <label for="vendor">Vendor</label>
+    <select id="vendor" required>
+      <option value="">-- Select Vendor --</option>
+      <option value="Plumber's Crack">Plumber's Crack</option>
+      <option value="Van Marcke">Van Marcke</option>
+      <option value="Central Arizona">Central Arizona</option>
+      <option value="Home Depot">Home Depot</option>
+      <option value="Standard Plumbing">Standard Plumbing</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <div id="other-vendor-div" style="display:none;">
+      <label for="other-vendor">Enter Vendor Name</label>
+      <input type="text" id="other-vendor" />
+    </div>
+
+    <label for="job">Job Address</label>
+    <textarea id="job" required></textarea>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <div class="po-result" id="po-display"></div>
+
+  <script>
+    const vendorSelect = document.getElementById('vendor');
+    const otherVendorDiv = document.getElementById('other-vendor-div');
+    const otherVendorInput = document.getElementById('other-vendor');
+
+    vendorSelect.addEventListener('change', () => {
+      otherVendorDiv.style.display = vendorSelect.value === "Other" ? "block" : "none";
+    });
+
+    document.getElementById('po-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const tech = document.getElementById('tech').value;
+      let vendor = vendorSelect.value;
+      if (vendor === "Other") {
+        vendor = otherVendorInput.value.trim() || "Other";
+      }
+      const jobAddress = document.getElementById('job').value;
+
+      fetch("/api/po", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tech, vendor, jobAddress })
+      })
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById('po-display').textContent = "PO Number: " + data;
+      })
+      .catch(err => {
+        document.getElementById('po-display').textContent = "ERROR: " + err;
+      });
+    });
+  </script>
+</body>
+</html>
