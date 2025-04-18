@@ -33,6 +33,8 @@ module.exports = async (req, res) => {
     console.log("Google Script responded:", result);
 
     return res.status(200).send(result);
-  } catch (err) {
-    console.error("Caught error:", err);
-    return res.status(
+   } catch (err) {
+    console.error("Proxy error:", err);
+    return res.status(500).send("Proxy failed");
+  }
+};
